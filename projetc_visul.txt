@@ -1,0 +1,83 @@
+          +-----------------+
+          |  CSV Uploader   |
+          +--------+--------+
+                   |
+                   v
+           +-------+--------+
+           | DataFrame (DF) |
+           +-------+--------+
+                   |
+          +--------+--------+
+          |   NLP Layer     |
+          | (LLM parses NL)|
+          +--------+--------+
+                   |
+       +-----------+-----------+
+       |                       |
+   Ambiguous?               Clear?
+       |                       |
+   +---v---+               +---v---+
+   |Suggestions|           |Operation|
+   +---+---+               +---+---+
+       |                       |
+       +-----------+-----------+
+                   |
+          +--------v--------+
+          | Operation Layer |
+          | filter/sort/... |
+          +--------+--------+
+                   |
+          +--------v--------+
+          | Visualization / |
+          | Table Preview   |
+          +--------+--------+
+                   |
+          +--------v--------+
+          | Explanation Box |
+          +--------+--------+
+                   |
+          +--------v--------+
+          | Export / JSON   |
+          +-----------------+
+
+
+
+
+
+Complete Project Structure
+
+data-explorer-with-nl/
+├── main_integration.py              # ← CREATE THIS AT ROOT LEVEL
+├── streamlit_app.py                 # Main Streamlit application
+├── requirements.txt                 # Project dependencies
+├── README.md                       # Project documentation
+├── Project5.csv                    # Sample dataset
+├── nlp_module/                     # Your NLP module
+│   ├── __init__.py
+│   ├── config.py
+│   ├── nlp_manager.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── query_analyzer.py
+│   │   ├── suggestion_generator.py
+│   │   └── context_manager.py
+│   ├── parsers/
+│   │   ├── __init__.py
+│   │   ├── base_parser.py
+│   │   └── llm_parser.py
+│   ├── formatters/
+│   │   ├── __init__.py
+│   │   └── ui_formatter.py
+│   └── utils/
+│       ├── __init__.py
+│       └── patterns.py
+├── operations/                     # Data operations module
+│   ├── __init__.py
+│   ├── base_operations.py
+│   ├── filter_operations.py
+│   ├── aggregate_operations.py
+│   └── visualization.py
+└── tests/                         # Test files
+    ├── __init__.py
+    ├── test_nlp.py
+    └── test_operations.py
