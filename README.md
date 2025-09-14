@@ -69,7 +69,7 @@ Export results in CSV, JSON or XLSX formats.
 
 Save/load session state to persist query history.
 
-Project Structure
+## Project Structure
 
 App.py: Main Streamlit application
 
@@ -89,31 +89,26 @@ exports/: Stores exported data and session state
 
 requirements.txt: Project dependencies
 
-Dependencies
+## Dependencies
 
 Streamlit
-
 Pandas
-
 Plotly
-
 Transformers
-
 Torch
-
 Openpyxl
 
-Notes
+## Notes
 
-Rule-based parsing is primary; LLM (google/flan-t5-base) serves as a fallback.
+Rule based parsing is primary, LLM (google/flan-t5-base) serves as a fallback.
 
 Supports operations: filter, sort, group & aggregate, pivot, preview.
 
 Optimized for datasets with columns like date, year, quarter, region, product_name, net_revenue.
 
-Team & Task Division
+## Team & Task Division
 
-Tanmay Mishra – Data Handling & Operations
+# Tanmay Mishra – Data Handling & Operations (Task 1)
 
 CSV uploader & dataset preview
 
@@ -121,7 +116,7 @@ Core data operations library (filter, sort, group, aggregate, pivot)
 
 JSON persistence for saving/loading session history
 
-Nikisha Bongale – NLP & Suggestions
+# Nikisha Bongale – NLP & Suggestions (Task 2)
 
 Query parsing from plain English to structured operations
 
@@ -129,7 +124,7 @@ Generates 2–3 meaningful suggestions for vague queries
 
 Produces human-readable explanations of results
 
-Pavan Singh – Streamlit UI & User Experience
+# Pavan Singh – Streamlit UI & User Experience (Task 3)
 
 Streamlit layout: command box, suggestions panel, chart area, explanation panel, export options
 
