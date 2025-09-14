@@ -33,12 +33,11 @@ Data Explorer with Natural Commands allows users to upload CSV datasets and quer
 ## Setup
 
 ### Clone the Repository
+## Setup
+
 ```bash
 git clone https://github.com/Nikisha1998/Data-explorer-with-natural-commands.git
 cd Data-explorer-with-natural-commands
-
-
-## Create and Activate a Virtual Environment
 
 # Linux/macOS
 python -m venv venv
@@ -48,9 +47,9 @@ source venv/bin/activate
 python -m venv venv
 venv\Scripts\activate
 
-
-## Install Dependencies
 pip install -r requirements.txt
+
+
 
 ## Run the App
 streamlit run App.py
