@@ -1,65 +1,62 @@
-# Data-explorer-with-natural-commands
+# Data Explorer with Natural Commands
 
 A Streamlit-based application enabling non-technical users to query and analyze datasets using natural language. Built for Finkraft.ai's AI Engineer Showcase Round (Team T27).
 
-# Overview
+---
+
+## Overview
 
 Data Explorer with Natural Commands allows users to upload CSV datasets and query them with plain language (e.g., "show seasonality by region", "top 5 products this quarter"). It combines rule-based and LLM-based query parsing, provides dynamic visualizations (bar, line, heatmap), offers query suggestions for ambiguous inputs, and supports data export (CSV, JSON, XLSX) and session persistence.
 
+---
 
+## Features
 
-# Features
+- **Natural Language Queries:** Supports queries like seasonality, top products, and performance analysis.  
+- **Dynamic Visualizations:** Plotly-based bar, line, and heatmap charts.  
+- **Query Suggestions:** Provides 2–3 alternative interpretations for vague queries.  
+- **Operation Explanations:** Human-readable summaries of executed operations.  
+- **Data Export:** Download results in CSV, JSON, or XLSX formats.  
+- **Session Persistence:** Save/load query history via JSON.  
+- **Efficient Processing:** Handles datasets with thousands of rows (tested with 6,199 rows).  
 
-Natural Language Queries: Supports queries like seasonality, top products, and performance analysis.
+---
 
-Dynamic Visualizations: Plotly-based bar, line, and heatmap charts.
+## Dataset
 
-Query Suggestions: Provides 2–3 alternative interpretations for vague queries.
+- **File:** `data/Project5.csv` (6,199 rows, 0.8MB)  
+- **Columns:** date, year, quarter, month, region, segment, channel, product_category, product_name, sku, units_sold, unit_price, discount_pct, gross_revenue, cogs, tax_pct, tax_amount, returned_units, net_revenue  
+- **Description:** Daily orders with financial metrics across regions, segments, and product categories.  
 
-Operation Explanations: Human-readable summaries of executed operations.
+---
 
-Data Export: Download results in CSV, JSON, or XLSX formats.
-
-Session Persistence: Save/load query history via JSON.
-
-Efficient Processing: Handles datasets with thousands of rows (tested with 6,199 rows).
-
-
-# Dataset
-
-File: data/Project5.csv (6,199 rows, 0.8MB)
-
-Columns: date, year, quarter, month, region, segment, channel, product_category, product_name, sku, units_sold, unit_price, discount_pct, gross_revenue, cogs, tax_pct, tax_amount, returned_units, net_revenue
-
-Description: Daily orders with financial metrics across regions, segments, and product categories.
-
-
-
-# Setup
+## Setup
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/Nikisha1998/Data-explorer-with-natural-commands.git```
+git clone https://github.com/Nikisha1998/Data-explorer-with-natural-commands.git
 cd Data-explorer-with-natural-commands
 
 
-Create and activate a virtual environment:
+## Create and Activate a Virtual Environment
 
+# Linux/macOS
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate
+
+# Windows
+python -m venv venv
+venv\Scripts\activate
 
 
-`Install dependencies:`
-
+## Install Dependencies
 pip install -r requirements.txt
 
-
-`Run the app:`
-
+## Run the App
 streamlit run App.py
 
 
-# Usage
+## Usage
 
 Upload a CSV file (e.g., data/Project5.csv) via the sidebar.
 
@@ -73,8 +70,7 @@ Export results in CSV, JSON, or XLSX formats.
 
 Save/load session state to persist query history.
 
-
-# Project Structure
+Project Structure
 
 App.py: Main Streamlit application
 
@@ -94,7 +90,7 @@ exports/: Stores exported data and session state
 
 requirements.txt: Project dependencies
 
-# Dependencies
+Dependencies
 
 Streamlit
 
@@ -108,8 +104,7 @@ Torch
 
 Openpyxl
 
-
-# Notes
+Notes
 
 Rule-based parsing is primary; LLM (google/flan-t5-base) serves as a fallback.
 
@@ -117,42 +112,31 @@ Supports operations: filter, sort, group & aggregate, pivot, preview.
 
 Optimized for datasets with columns like date, year, quarter, region, product_name, net_revenue.
 
-# Team
+Team & Task Division
 
-Tanmay Mishra
+Tanmay Mishra – Data Handling & Operations
 
-Nikisha Bongale
+CSV uploader & dataset preview
 
-Pavan Singh
+Core data operations library (filter, sort, group, aggregate, pivot)
 
-# # Team
+JSON persistence for saving/loading session history
 
-- **Tanmay Mishra**  
-- **Nikisha Bongale**  
-- **Pavan Singh**  
+Nikisha Bongale – NLP & Suggestions
 
-# Task Division
+Query parsing from plain English to structured operations
 
-To ensure smooth collaboration, our team divided responsibilities as follows:
+Generates 2–3 meaningful suggestions for vague queries
 
-### 1. Data Handling & Operations – *Tanmay Mishra*  
-- Implemented CSV uploader & dataset preview  
-- Built the core data operations library (filter, sort, group, aggregate, pivot)  
-- Optimized handling of mid-sized datasets (thousands of rows)  
-- Designed JSON persistence for saving/loading session history  
+Produces human-readable explanations of results
 
-### 2. Natural Language Processing (NLP) & Suggestions – *Nikisha Bongale*  
-- Developed query parsing from plain English to structured operations  
-- Handled vague queries by generating 2–3 meaningful suggestions  
-- Connected parsed intent to backend operations  
-- Generated short, human-readable explanations of results  
+Pavan Singh – Streamlit UI & User Experience
 
-### 3. Streamlit UI & User Experience – *Pavan Singh*  
-- Designed Streamlit layout (command box, suggestions panel, chart area, explanation panel, export options)  
-- Integrated visualizations (Plotly) for bar, line, and heatmap charts  
-- Ensured smooth, intuitive user interactions  
-- Connected UI actions with the NLP and operations backend  
+Streamlit layout: command box, suggestions panel, chart area, explanation panel, export options
 
+Integrated Plotly visualizations (bar, line, heatmap)
+
+Connected UI actions with NLP and backend operations
 
 
 # Demo
