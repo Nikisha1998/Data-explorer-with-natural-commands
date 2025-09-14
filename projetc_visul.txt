@@ -1,44 +1,51 @@
-          +-----------------+
-          |  CSV Uploader   |
-          +--------+--------+
-                   |
-                   v
-           +-------+--------+
-           | DataFrame (DF) |
-           +-------+--------+
-                   |
-          +--------+--------+
-          |   NLP Layer     |
-          | (LLM parses NL)|
-          +--------+--------+
-                   |
-       +-----------+-----------+
-       |                       |
-   Ambiguous?               Clear?
-       |                       |
-   +---v---+               +---v---+
-   |Suggestions|           |Operation|
-   +---+---+               +---+---+
-       |                       |
-       +-----------+-----------+
-                   |
-          +--------v--------+
-          | Operation Layer |
-          | filter/sort/... |
-          +--------+--------+
-                   |
-          +--------v--------+
-          | Visualization / |
-          | Table Preview   |
-          +--------+--------+
-                   |
-          +--------v--------+
-          | Explanation Box |
-          +--------+--------+
-                   |
-          +--------v--------+
-          | Export / JSON   |
-          +-----------------+
+                ┌──────────────────────────┐
+                │        User Input        │
+                │  - Upload CSV file       │
+                │  - Type natural query    │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │      Preprocessing       │
+                │ - Read CSV, show preview │
+                │ - Extract metadata       │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │  Query Understanding     │
+                │  1. LLM (flan-t5-base)   │
+                │  2. Rule-based fallback  │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │ Operation Suggestion     │
+                │ - Generate 2–3 options   │
+                │ - User confirms/refines  │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │  Data Operations Engine  │
+                │ - Filter / Sort / Group  │
+                │ - Aggregate / Pivot      │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │   Visualization & View   │
+                │ - Charts (line, bar etc.)│
+                │ - Data table updates     │
+                │ - Explanation text       │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │   Export & Download      │
+                │ - CSV export             │
+                │ - Chart/image download   │
+                └──────────────────────────┘
 
 
 
@@ -46,38 +53,34 @@
 
 Complete Project Structure
 
-data-explorer-with-nl/
-├── main_integration.py              # ← CREATE THIS AT ROOT LEVEL
-├── streamlit_app.py                 # Main Streamlit application
-├── requirements.txt                 # Project dependencies
-├── README.md                       # Project documentation
-├── Project5.csv                    # Sample dataset
-├── nlp_module/                     # Your NLP module
-│   ├── __init__.py
-│   ├── config.py
-│   ├── nlp_manager.py
-│   ├── core/
+data-explorer-with-natural-commands/
+├── App.py                        # Main Streamlit app entry point
+├── config.py                     # Configuration file (app settings)
+├── nlp_manager.py                # Handles NLP query processing
+├── prompt.py                     # Prompt templates for LLM + rules
+├── projetc_visul.txt             # Project notes / visualization plan
+├── requirements.txt              # Project dependencies
+├── README.md                     # Documentation and usage guide
+├── .gitignore                    # Ignore venv/cache files
+│
+├── data/                         # Sample datasets (CSV/TXT)
+│
+├── exports/                      # Exported files from app
+│   └── session_state.json        # Persisted session state
+│
+├── nlp_module/                   # NLP processing logic
+│   ├── __init__.py               # Marks folder as Python package
+│   ├── config.py                 # NLP-specific configs
+│   ├── core/                     # Core parsing logic
+│   │   ├── parser.py             # Natural language → operations
 │   │   ├── __init__.py
-│   │   ├── query_analyzer.py
-│   │   ├── suggestion_generator.py
-│   │   └── context_manager.py
-│   ├── parsers/
+│   │   └── __pycache__/          # Cache files
+│   ├── formatters/               # Formatting responses for UI
+│   │   ├── ui_formatter.py       # Prepares clean text for frontend
 │   │   ├── __init__.py
-│   │   ├── base_parser.py
-│   │   └── llm_parser.py
-│   ├── formatters/
-│   │   ├── __init__.py
-│   │   └── ui_formatter.py
-│   └── utils/
-│       ├── __init__.py
-│       └── patterns.py
-├── operations/                     # Data operations module
-│   ├── __init__.py
-│   ├── base_operations.py
-│   ├── filter_operations.py
-│   ├── aggregate_operations.py
-│   └── visualization.py
-└── tests/                         # Test files
-    ├── __init__.py
-    ├── test_nlp.py
-    └── test_operations.py
+│   │   └── __pycache__/          
+│   └── __pycache__/              
+│
+├── __pycache__/                  # Python cache files
+│
+└── venv/                         # Virtual environment (not for submission)

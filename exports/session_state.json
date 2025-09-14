@@ -1,0 +1,11 @@
+{
+  "operations_history": [
+    {
+      "query": "show top 5 products revenue by region",
+      "operation": {
+        "operation": "filter_and_group",
+        "args": {
+          "filters": [
+            {
+              "column": "quarter",
+              "value": 

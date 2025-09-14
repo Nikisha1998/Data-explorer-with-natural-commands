@@ -1,14 +1,11 @@
-"""
-Enhanced NLP Manager for Data Explorer with Natural Commands
-"""
 import pandas as pd
 import logging
 from typing import Dict, List, Optional, Any
 from dataclasses import asdict
-
 from nlp_module.core.parser import QueryParser, ParsedQuery
 from nlp_module.formatters.ui_formatter import UIFormatter
 from config import DATASET_COLUMNS, UI_CONFIG
+from io import BytesIO
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +14,7 @@ class NLPManager:
     
     def __init__(self, columns: List[str] = None):
         self.columns = columns or DATASET_COLUMNS
-        self.parser = QueryParser(self.columns)
+        self.parser = QueryParser(self.columns, df=None)
         self.formatter = UIFormatter()
         self.df = None
         self.current_view = None
@@ -26,19 +23,12 @@ class NLPManager:
         """Set the dataset context"""
         self.df = df
         self.columns = list(df.columns)
-        self.parser = QueryParser(self.columns)  # Recreate with actual columns
+        self.parser = QueryParser(self.columns, df=df)
         logger.info(f"Dataset loaded: {df.shape}")
     
     def process_query(self, query: str, debug: bool = False) -> Dict[str, Any]:
         """
         Process natural language query and return structured result
-        
-        Args:
-            query: Natural language query
-            debug: Enable debug logging
-            
-        Returns:
-            Dict containing parsed query, suggestions, and metadata
         """
         if not query or not query.strip():
             return {
@@ -53,16 +43,10 @@ class NLPManager:
             }
         
         try:
-            # Parse the main query
             primary_result = self.parser.parse(query)
-            
             if debug:
                 logger.info(f"Primary parse: {asdict(primary_result)}")
-            
-            # Generate alternative interpretations
             suggestions = self._generate_suggestions(query, primary_result)
-            
-            # Execute the primary operation
             try:
                 result_data = self._execute_operation(primary_result)
                 self.current_view = result_data
@@ -90,11 +74,9 @@ class NLPManager:
         """Generate multiple interpretations for ambiguous queries"""
         suggestions = [self.formatter.format_suggestion(primary, confidence=primary.confidence)]
         
-        # Add alternative interpretations based on query patterns
         query_lower = query.lower()
         
         if "performance" in query_lower and len(suggestions) == 1:
-            # Add alternative performance views
             alternatives = [
                 ParsedQuery(
                     operation="group_and_aggregate",
@@ -111,13 +93,11 @@ class NLPManager:
                     source="alternative"
                 )
             ]
-            
             for alt in alternatives:
                 if len(suggestions) < UI_CONFIG["max_suggestions"]:
                     suggestions.append(self.formatter.format_suggestion(alt, confidence=alt.confidence))
         
         elif "seasonality" in query_lower and "region" not in query_lower:
-            # Add regional seasonality view
             alt = ParsedQuery(
                 operation="pivot_data",
                 args={
@@ -133,24 +113,51 @@ class NLPManager:
             suggestions.append(self.formatter.format_suggestion(alt, confidence=alt.confidence))
         
         elif "top" in query_lower and "product" in query_lower:
-            # Add alternative top product views
+            latest_quarter = self.df['quarter'].max() if self.df is not None else "Q3"
             alternatives = [
                 ParsedQuery(
-                    operation="group_and_aggregate",
-                    args={"group_col": "product_name", "agg_col": "units_sold", "agg_func": "sum", "limit": 5},
-                    explanation="Top 5 products by units sold",
+                    operation="filter_and_group",
+                    args={
+                        "filters": [{"column": "quarter", "value": latest_quarter}],
+                        "group_col": "product_name",
+                        "agg_col": "units_sold",
+                        "agg_func": "sum",
+                        "limit": 5,
+                        "sort": "desc"
+                    },
+                    explanation=f"Top 5 products by units sold in quarter {latest_quarter}",
                     confidence=0.7,
                     source="alternative"
                 ),
                 ParsedQuery(
                     operation="group_and_aggregate",
                     args={"group_col": "product_category", "agg_col": "net_revenue", "agg_func": "mean"},
-                    explanation="Average revenue by product category", 
+                    explanation="Average revenue by product category",
                     confidence=0.6,
                     source="alternative"
                 )
             ]
-            
+            for alt in alternatives:
+                if len(suggestions) < UI_CONFIG["max_suggestions"]:
+                    suggestions.append(self.formatter.format_suggestion(alt, confidence=alt.confidence))
+        
+        elif "compare" in query_lower or "trends" in query_lower:
+            alternatives = [
+                ParsedQuery(
+                    operation="group_and_aggregate",
+                    args={"group_col": "year", "agg_col": "net_revenue", "agg_func": "sum"},
+                    explanation="Revenue trends by year",
+                    confidence=0.7,
+                    source="alternative"
+                ),
+                ParsedQuery(
+                    operation="pivot_data",
+                    args={"index_col": "year", "columns_col": "region", "values_col": "net_revenue", "agg_func": "sum"},
+                    explanation="Compare revenue across regions by year",
+                    confidence=0.65,
+                    source="alternative"
+                )
+            ]
             for alt in alternatives:
                 if len(suggestions) < UI_CONFIG["max_suggestions"]:
                     suggestions.append(self.formatter.format_suggestion(alt, confidence=alt.confidence))
@@ -166,7 +173,20 @@ class NLPManager:
             operation = parsed_query.operation
             args = parsed_query.args
             
-            if operation == "group_and_aggregate":
+            # Validate columns
+            for key in ['group_col', 'agg_col', 'column', 'index_col', 'columns_col', 'values_col']:
+                if key in args and args[key] not in self.df.columns:
+                    raise ValueError(f"Column '{args[key]}' not found in dataset")
+            
+            # Validate numeric columns for aggregations
+            if operation in ["group_and_aggregate", "filter_and_group", "pivot_data"]:
+                agg_col = args.get("agg_col", args.get("values_col"))
+                if agg_col and not pd.api.types.is_numeric_dtype(self.df[args.get("agg_col", args.get("values_col"))]):
+                    raise ValueError(f"Column '{agg_col}' must be numeric for aggregation")
+            
+            if operation == "filter_and_group":
+                return self._filter_and_group(args)
+            elif operation == "group_and_aggregate":
                 return self._group_and_aggregate(args)
             elif operation == "filter_data":
                 return self._filter_data(args)
@@ -182,10 +202,41 @@ class NLPManager:
             logger.error(f"Operation execution failed: {e}")
             return None
     
+    def _filter_and_group(self, args: Dict) -> pd.DataFrame:
+        """Execute filter and group operation"""
+        filters = args.get("filters", [])
+        group_col = args["group_col"]
+        agg_col = args["agg_col"]
+        agg_func = args.get("agg_func", "sum")
+        limit = args.get("limit")
+        sort_order = args.get("sort", "desc")
+        
+        # Apply multiple filters
+        filtered_df = self.df.copy()
+        for filter_args in filters:
+            column = filter_args.get("column")
+            value = filter_args.get("value")
+            if column not in self.df.columns:
+                raise ValueError(f"Column '{column}' not found in dataset")
+            filtered_df = filtered_df[filtered_df[column] == value]
+        
+        # Group and aggregate
+        grouped = filtered_df.groupby(group_col)[agg_col].agg(agg_func).reset_index()
+        grouped.columns = [group_col, f"{agg_func}_{agg_col}"]
+        
+        # Sort results
+        ascending = sort_order.lower() == "asc"
+        grouped = grouped.sort_values(f"{agg_func}_{agg_col}", ascending=ascending)
+        
+        if limit:
+            grouped = grouped.head(limit)
+            
+        return grouped
+    
     def _group_and_aggregate(self, args: Dict) -> pd.DataFrame:
         """Execute group and aggregate operation"""
         group_col = args["group_col"]
-        agg_col = args["agg_col"] 
+        agg_col = args["agg_col"]
         agg_func = args.get("agg_func", "sum")
         limit = args.get("limit")
         sort_order = args.get("sort", "desc")
@@ -193,7 +244,6 @@ class NLPManager:
         grouped = self.df.groupby(group_col)[agg_col].agg(agg_func).reset_index()
         grouped.columns = [group_col, f"{agg_func}_{agg_col}"]
         
-        # Sort results
         ascending = sort_order.lower() == "asc"
         grouped = grouped.sort_values(f"{agg_func}_{agg_col}", ascending=ascending)
         
@@ -231,10 +281,10 @@ class NLPManager:
         
         return self.df.pivot_table(
             index=index_col,
-            columns=columns_col, 
+            columns=columns_col,
             values=values_col,
             aggfunc=agg_func,
-            fill_value=0
+            fill_value=None
         ).reset_index()
     
     def get_export_data(self, format: str = "csv") -> Optional[bytes]:
@@ -246,5 +296,9 @@ class NLPManager:
             return self.current_view.to_csv(index=False).encode()
         elif format.lower() == "json":
             return self.current_view.to_json(orient="records").encode()
+        elif format.lower() == "xlsx":
+            output = BytesIO()
+            self.current_view.to_excel(output, index=False, engine='openpyxl')
+            return output.getvalue()
         else:
             return None
