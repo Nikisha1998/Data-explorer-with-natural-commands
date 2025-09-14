@@ -1,22 +1,22 @@
 # Data Explorer with Natural Commands
 
-A Streamlit-based application enabling non-technical users to query and analyze datasets using natural language. Built for Finkraft.ai's AI Engineer Showcase Round (Team T27).
+A Streamlit based application enabling non-technical users to query and analyze datasets using natural language. Built for Finkraft.ai's AI Engineer Showcase Round (Team T27).
 
 ---
 
 ## Overview
 
-Data Explorer with Natural Commands allows users to upload CSV datasets and query them with plain language (e.g., "show seasonality by region", "top 5 products this quarter"). It combines rule-based and LLM-based query parsing, provides dynamic visualizations (bar, line, heatmap), offers query suggestions for ambiguous inputs, and supports data export (CSV, JSON, XLSX) and session persistence.
+Data Explorer with Natural Commands allows users to upload CSV datasets and query them with plain language (Eg. "show seasonality by region", "top 5 products this quarter"). It combines rule based and LLM based query parsing, provides dynamic visualizations (bar, line, heatmap), offers query suggestions for ambiguous inputs and supports data export (CSV, JSON, XLSX) and session persistence.
 
 ---
 
 ## Features
 
-- **Natural Language Queries:** Supports queries like seasonality, top products, and performance analysis.  
-- **Dynamic Visualizations:** Plotly-based bar, line, and heatmap charts.  
+- **Natural Language Queries:** Supports queries like seasonality, top products and performance analysis.  
+- **Dynamic Visualizations:** Plotly-based bar, line and heatmap charts.  
 - **Query Suggestions:** Provides 2–3 alternative interpretations for vague queries.  
 - **Operation Explanations:** Human-readable summaries of executed operations.  
-- **Data Export:** Download results in CSV, JSON, or XLSX formats.  
+- **Data Export:** Download results in CSV, JSON or XLSX formats.  
 - **Session Persistence:** Save/load query history via JSON.  
 - **Efficient Processing:** Handles datasets with thousands of rows (tested with 6,199 rows).  
 
@@ -26,7 +26,7 @@ Data Explorer with Natural Commands allows users to upload CSV datasets and quer
 
 - **File:** `data/Project5.csv` (6,199 rows, 0.8MB)  
 - **Columns:** date, year, quarter, month, region, segment, channel, product_category, product_name, sku, units_sold, unit_price, discount_pct, gross_revenue, cogs, tax_pct, tax_amount, returned_units, net_revenue  
-- **Description:** Daily orders with financial metrics across regions, segments, and product categories.  
+- **Description:** Daily orders with financial metrics across regions, segments and product categories.  
 
 ---
 
@@ -57,15 +57,15 @@ streamlit run App.py
 
 ## Usage
 
-Upload a CSV file (e.g., data/Project5.csv) via the sidebar.
+Upload a CSV file (e.g data/Project5.csv) via the sidebar.
 
-Enter a natural language query (e.g., "show seasonality by region", "top 5 products this quarter").
+Enter a natural language query (e.g "show seasonality by region", "top 5 products this quarter").
 
 View results: data table, visualization (bar, line, or heatmap), operation explanation, and suggestions.
 
 Select alternative suggestions for ambiguous queries.
 
-Export results in CSV, JSON, or XLSX formats.
+Export results in CSV, JSON or XLSX formats.
 
 Save/load session state to persist query history.
 
@@ -75,7 +75,7 @@ App.py: Main Streamlit application
 
 nlp_manager.py: Query processing and operation execution
 
-nlp_module/core/parser.py: Rule-based and LLM-based query parsing
+nlp_module/core/parser.py: Rule based and LLM based query parsing
 
 nlp_module/formatters/ui_formatter.py: Formats suggestions for UI
 
