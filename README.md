@@ -39,7 +39,7 @@ Description: Daily orders with financial metrics across regions, segments, and p
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/Nikisha1998/Data-explorer-with-natural-commands.git
+git clone https://github.com/Nikisha1998/Data-explorer-with-natural-commands.git```
 cd Data-explorer-with-natural-commands
 
 
