@@ -157,4 +157,4 @@ To ensure smooth collaboration, our team divided responsibilities as follows:
 
 # Demo
 
-A demo video (demo/demo.mp4) is included in the repository or available at <link> (to be updated after upload).
+A demo video (demo/demo.mp4) is included in the repository or available at <https://drive.google.com/file/d/166U9IX5g2uTiQFyKMZu8VkT4KAmU-vkQ/view?usp=sharing>.
